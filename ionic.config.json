@@ -1,5 +1,8 @@
 {
   "name": "HorariosESIME",
-  "integrations": {},
+  "integrations": {
+    "capacitor": {},
+    "cordova": {}
+  },
   "type": "angular"
 }

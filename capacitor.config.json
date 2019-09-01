@@ -1,0 +1,7 @@
+{
+  "appId": "com.horarios.esime",
+  "appName": "HorariosESIME",
+  "bundledWebRuntime": false,
+  "npmClient": "npm",
+  "webDir": "www"
+}

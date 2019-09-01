@@ -1,0 +1,49 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Horario</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-grid>
+    <ion-row *ngIf="grupos.length <= 0">
+      <ion-col size="12" size-sm="8" offset-sm="2" padding>
+        <ion-label>
+          <h2 text-center>Sin Grupos.</h2>
+          <p>Porfavor, suscribase a al menos un grupo para generar un horario</p>
+          <p>{{ grupos.length }}</p>
+        </ion-label>
+        <div text-center>
+          <ion-button routerLink="/notificaciones/suscribir" margin>Suscripciones</ion-button>
+        </div>
+      </ion-col>
+    </ion-row>
+    <ion-row *ngIf="grupos.length > 0">
+        <ion-col size="12" size-sm="8" offset-sm="2">
+            <ion-slides pager="true" padding>
+                <ion-slide *ngFor="let horario of horarios">
+                  <ion-grid>
+                    <ion-row>
+                      <ion-col>
+                        <h1>{{ horario.nombre }}</h1>
+                      </ion-col>
+                    </ion-row>
+                    <ion-row *ngFor="let bloque of horario.bloques">
+                        <ion-col>
+                          <ion-card>
+                            <ion-card-header>
+                              <ion-card-title>{{ bloque.rango }}</ion-card-title>
+                            </ion-card-header>
+                            <ion-card-content>
+                              <h2>{{ }}</h2>
+                            </ion-card-content>
+                          </ion-card>
+                        </ion-col>
+                      </ion-row>
+                  </ion-grid>
+                </ion-slide>
+              </ion-slides>
+        </ion-col>
+      </ion-row>
+  </ion-grid>
+</ion-content>
