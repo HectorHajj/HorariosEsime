@@ -1,3 +1,5 @@
+import { Grupo } from './grupo.model';
+
 export class Horario {
     constructor(
         public nombre: string,
@@ -10,6 +12,7 @@ export class Bloque {
         public orden: number,
         public rango: string,
         public horaInicio: string,
-        public horaFin: string
+        public horaFin: string,
+        public grupos: Grupo[]
     ) { }
 }

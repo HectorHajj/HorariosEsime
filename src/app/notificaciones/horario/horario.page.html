@@ -30,12 +30,15 @@
                     </ion-row>
                     <ion-row *ngFor="let bloque of horario.bloques">
                         <ion-col>
-                          <ion-card>
+                          <ion-card *ngIf="bloque.grupos.length > 0">
                             <ion-card-header>
                               <ion-card-title>{{ bloque.rango }}</ion-card-title>
                             </ion-card-header>
                             <ion-card-content>
-                              <h2></h2>
+                              <ion-label *ngFor="let gp of bloque.grupos" padding>
+                                  <h4 text-center>{{ gp.asignatura }}</h4>
+                                  <p><span>{{ gp.clave }}</span> - <span>{{gp.maestro}}</span></p>
+                              </ion-label>
                             </ion-card-content>
                           </ion-card>
                         </ion-col>

@@ -49,7 +49,7 @@ export class NotificacionesService {
     getGrupos(valorBusqueda: string) {
         // Armar link para api respecto a los valores introducidos
         let url = 'http://www.eventos.esimecu.ipn.mx/horarios-2/index/compartir-grupales?';
-        
+
         // Recuperar grupos ya suscritos
         const gruposSuscritos: Grupo[] = [];
         this.storage
@@ -316,7 +316,7 @@ export class NotificacionesService {
                                 // Cuarta parte - Elegir el grupo especificado
                                 if (valorBusqueda.toLowerCase() === grupos['data'][grupo].v_g.toLowerCase()) {
                                     // Si el grupo ya esta suscrito
-                                    if (gruposSuscritos.find(g => g.id === grupos['data'][grupo].orden + grupos['data'][grupo].v_g)) { 
+                                    if (gruposSuscritos.find(g => g.id === grupos['data'][grupo].orden + grupos['data'][grupo].v_g)) {
                                         gruposCargados.push
                                         (
                                             new Grupo
