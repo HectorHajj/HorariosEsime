@@ -4,431 +4,120 @@ import { Subscription } from 'rxjs';
 import { Storage } from '@ionic/storage';
 
 import { Grupo } from '../grupo.model';
-import { Horario, Bloque } from '../horario.model';
-import { Time } from '@angular/common';
+import { GrupoClase } from '../grupoClase.model';
+import { Horario, Dia, BloqueHorario } from '../horario.model';
 
 @Component({
   selector: 'app-horario',
   templateUrl: './horario.page.html',
   styleUrls: ['./horario.page.scss'],
 })
-export class HorarioPage implements OnInit {
+export class HorarioPage {
   private gruposSub: Subscription;
   grupos: Grupo[] = [];
-  horarios: Horario[] = [
-    new Horario(
-      'Lunes',
-      [
-        new Bloque(
-          1,
-          '7:00 a 8:30',
-          '7:00',
-          '8:30',
-          []
-        ),
-        new Bloque(
-          2,
-          '8:30 a 10:00',
-          '8:30',
-          '10:00',
-          []
-        ),
-        new Bloque(
-          3,
-          '10:00 a 11:30',
-          '10:00',
-          '11:30',
-          []
-        ),
-        new Bloque(
-          4,
-          '11:30 a 13:00',
-          '11:30',
-          '13:00',
-          []
-        ),
-        new Bloque(
-          5,
-          '13:00 a 14:30',
-          '13:00',
-          '14:30',
-          []
-        ),
-        new Bloque(
-          6,
-          '14:30 a 16:00',
-          '14:30',
-          '16:00',
-          []
-        ),
-        new Bloque(
-          7,
-          '16:00 a 17:30',
-          '16:00',
-          '17:30',
-          []
-        ),
-        new Bloque(
-          8,
-          '17:30 a 19:00',
-          '17:30',
-          '19:00',
-          []
-        ),
-        new Bloque(
-          9,
-          '19:00 a 20:30',
-          '19:00',
-          '20:30',
-          []
-        ),
-        new Bloque(
-          10,
-          '20:30 a 22:00',
-          '20:30',
-          '22:00',
-          []
-        )
-      ]
+  bloquesHorarios: BloqueHorario[] = [
+    new BloqueHorario(
+      1,
+      '7:00 a 8:30',
+      '7:00',
+      '8:30',
+      []
     ),
-    new Horario(
-      'Martes',
-      [
-        new Bloque(
-          1,
-          '7:00 a 8:30',
-          '7:00',
-          '8:30',
-          []
-        ),
-        new Bloque(
-          2,
-          '8:30 a 10:00',
-          '8:30',
-          '10:00',
-          []
-        ),
-        new Bloque(
-          3,
-          '10:00 a 11:30',
-          '10:00',
-          '11:30',
-          []
-        ),
-        new Bloque(
-          4,
-          '11:30 a 13:00',
-          '11:30',
-          '13:00',
-          []
-        ),
-        new Bloque(
-          5,
-          '13:00 a 14:30',
-          '13:00',
-          '14:30',
-          []
-        ),
-        new Bloque(
-          6,
-          '14:30 a 16:00',
-          '14:30',
-          '16:00',
-          []
-        ),
-        new Bloque(
-          7,
-          '16:00 a 17:30',
-          '16:00',
-          '17:30',
-          []
-        ),
-        new Bloque(
-          8,
-          '17:30 a 19:00',
-          '17:30',
-          '19:00',
-          []
-        ),
-        new Bloque(
-          9,
-          '19:00 a 20:30',
-          '19:00',
-          '20:30',
-          []
-        ),
-        new Bloque(
-          10,
-          '20:30 a 22:00',
-          '20:30',
-          '22:00',
-          []
-        )
-      ]
+    new BloqueHorario(
+      2,
+      '8:30 a 10:00',
+      '8:30',
+      '10:00',
+      []
     ),
-    new Horario(
-      'Miercoles',
-      [
-        new Bloque(
-          1,
-          '7:00 a 8:30',
-          '7:00',
-          '8:30',
-          []
-        ),
-        new Bloque(
-          2,
-          '8:30 a 10:00',
-          '8:30',
-          '10:00',
-          []
-        ),
-        new Bloque(
-          3,
-          '10:00 a 11:30',
-          '10:00',
-          '11:30',
-          []
-        ),
-        new Bloque(
-          4,
-          '11:30 a 13:00',
-          '11:30',
-          '13:00',
-          []
-        ),
-        new Bloque(
-          5,
-          '13:00 a 14:30',
-          '13:00',
-          '14:30',
-          []
-        ),
-        new Bloque(
-          6,
-          '14:30 a 16:00',
-          '14:30',
-          '16:00',
-          []
-        ),
-        new Bloque(
-          7,
-          '16:00 a 17:30',
-          '16:00',
-          '17:30',
-          []
-        ),
-        new Bloque(
-          8,
-          '17:30 a 19:00',
-          '17:30',
-          '19:00',
-          []
-        ),
-        new Bloque(
-          9,
-          '19:00 a 20:30',
-          '19:00',
-          '20:30',
-          []
-        ),
-        new Bloque(
-          10,
-          '20:30 a 22:00',
-          '20:30',
-          '22:00',
-          []
-        )
-      ]
+    new BloqueHorario(
+      3,
+      '10:00 a 11:30',
+      '10:00',
+      '11:30',
+      []
     ),
-    new Horario(
-      'Jueves',
-      [
-        new Bloque(
-          1,
-          '7:00 a 8:30',
-          '7:00',
-          '8:30',
-          []
-        ),
-        new Bloque(
-          2,
-          '8:30 a 10:00',
-          '8:30',
-          '10:00',
-          []
-        ),
-        new Bloque(
-          3,
-          '10:00 a 11:30',
-          '10:00',
-          '11:30',
-          []
-        ),
-        new Bloque(
-          4,
-          '11:30 a 13:00',
-          '11:30',
-          '13:00',
-          []
-        ),
-        new Bloque(
-          5,
-          '13:00 a 14:30',
-          '13:00',
-          '14:30',
-          []
-        ),
-        new Bloque(
-          6,
-          '14:30 a 16:00',
-          '14:30',
-          '16:00',
-          []
-        ),
-        new Bloque(
-          7,
-          '16:00 a 17:30',
-          '16:00',
-          '17:30',
-          []
-        ),
-        new Bloque(
-          8,
-          '17:30 a 19:00',
-          '17:30',
-          '19:00',
-          []
-        ),
-        new Bloque(
-          9,
-          '19:00 a 20:30',
-          '19:00',
-          '20:30',
-          []
-        ),
-        new Bloque(
-          10,
-          '20:30 a 22:00',
-          '20:30',
-          '22:00',
-          []
-        )
-      ]
+    new BloqueHorario(
+      4,
+      '11:30 a 13:00',
+      '11:30',
+      '13:00',
+      []
     ),
-    new Horario(
-      'Viernes',
-      [
-        new Bloque(
-          1,
-          '7:00 a 8:30',
-          '7:00',
-          '8:30',
-          []
-        ),
-        new Bloque(
-          2,
-          '8:30 a 10:00',
-          '8:30',
-          '10:00',
-          []
-        ),
-        new Bloque(
-          3,
-          '10:00 a 11:30',
-          '10:00',
-          '11:30',
-          []
-        ),
-        new Bloque(
-          4,
-          '11:30 a 13:00',
-          '11:30',
-          '13:00',
-          []
-        ),
-        new Bloque(
-          5,
-          '13:00 a 14:30',
-          '13:00',
-          '14:30',
-          []
-        ),
-        new Bloque(
-          6,
-          '14:30 a 16:00',
-          '14:30',
-          '16:00',
-          []
-        ),
-        new Bloque(
-          7,
-          '16:00 a 17:30',
-          '16:00',
-          '17:30',
-          []
-        ),
-        new Bloque(
-          8,
-          '17:30 a 19:00',
-          '17:30',
-          '19:00',
-          []
-        ),
-        new Bloque(
-          9,
-          '19:00 a 20:30',
-          '19:00',
-          '20:30',
-          []
-        ),
-        new Bloque(
-          10,
-          '20:30 a 22:00',
-          '20:30',
-          '22:00',
-          []
-        )
-      ]
+    new BloqueHorario(
+      5,
+      '13:00 a 14:30',
+      '13:00',
+      '14:30',
+      []
     ),
+    new BloqueHorario(
+      6,
+      '14:30 a 16:00',
+      '14:30',
+      '16:00',
+      []
+    ),
+    new BloqueHorario(
+      7,
+      '16:00 a 17:30',
+      '16:00',
+      '17:30',
+      []
+    ),
+    new BloqueHorario(
+      8,
+      '17:30 a 19:00',
+      '17:30',
+      '19:00',
+      []
+    ),
+    new BloqueHorario(
+      9,
+      '19:00 a 20:30',
+      '19:00',
+      '20:30',
+      []
+    ),
+    new BloqueHorario(
+      10,
+      '20:30 a 22:00',
+      '20:30',
+      '22:00',
+      []
+    )
   ];
+  horario: Horario = new Horario(
+      [
+        new Dia	(
+          'Lunes',
+          'l',
+          JSON.parse(JSON.stringify(this.bloquesHorarios))
+        ),
+        new Dia	(
+          'Martes',
+          'm',
+          JSON.parse(JSON.stringify(this.bloquesHorarios))
+        ),
+        new Dia	(
+          'Miércoles',
+          'x',
+          JSON.parse(JSON.stringify(this.bloquesHorarios))
+        ),
+        new Dia	(
+          'Jueves',
+          'j',
+          JSON.parse(JSON.stringify(this.bloquesHorarios))
+        ),
+        new Dia	(
+          'Viernes',
+          'v',
+          JSON.parse(JSON.stringify(this.bloquesHorarios))
+        ),
+      ]
+    );
 
   constructor(private notifService: NotificacionesService, private storage: Storage) { }
-
-  ngOnInit() {
-    // Recuperar grupos suscritos del usuario
-    this.storage
-      .get('gruposSuscritos')
-      .then(gruposSuscritos => {
-        if (gruposSuscritos !== null) {
-          gruposSuscritos.forEach(grupo => {
-            this.grupos.push(grupo);
-          });
-        }
-        this.horarios.forEach(horario => {
-          horario.bloques.forEach(bloque => {
-            bloque.grupos = [];
-          });
-        });
-
-        this.grupos.forEach(grupo => {
-          grupo.Horario.forEach(dia => {
-            this.horarios.forEach(horario => {
-              if (dia.nombre === horario.nombre) {
-                if (dia.hora.length > 0) {
-                  horario.bloques.forEach(bloque => {
-                    if (bloque.rango === dia.hora) {
-                      bloque.grupos.push(grupo);
-                    }
-                  });
-                }
-              }
-            });
-          });
-        });
-      });
-
-  }
 
   ionViewWillEnter() {
     // Recuperar grupos suscritos del usuario
@@ -443,27 +132,31 @@ export class HorarioPage implements OnInit {
           });
         }
 
-        this.horarios.forEach(horario => {
-          horario.bloques.forEach(bloque => {
-            bloque.grupos = [];
+        // Resetea el horario
+        this.horario.dias.forEach(dia => {
+          dia.BloquesHorarios.forEach(bloque => {
+            bloque.gruposClase = [];
           });
         });
 
-        this.grupos.forEach(grupo => {
-          grupo.Horario.forEach(dia => {
-            this.horarios.forEach(horario => {
-              if (dia.nombre === horario.nombre) {
-                if (dia.hora.length > 0) {
-                  horario.bloques.forEach(bloque => {
-                    if (bloque.rango === dia.hora) {
-                      bloque.grupos.push(grupo);
-                    }
-                  });
-                }
-              }
+        // Armar Horario con las clases de los grupos suscritos
+        if (this.grupos.length > 0) {
+          this.grupos.forEach(grupo => {
+            grupo.Clases.forEach(clase => {
+              const dia: Dia = this.horario.dias.find(diaClase => diaClase.clave === clase.claveDia);
+              const bloque: BloqueHorario = dia.BloquesHorarios.find(bloqueClase => bloqueClase.horaInicio === clase.horaInicio);
+
+              // Construir y agregar GrupoClase
+              bloque.gruposClase.push(new GrupoClase (
+                grupo.id,
+                grupo.clave,
+                grupo.asignatura,
+                grupo.docente,
+                clase.aula
+              ));
             });
           });
-        });
+        }
       });
   }
 }

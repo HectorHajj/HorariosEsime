@@ -18,12 +18,12 @@
           <ion-spinner color="primary"></ion-spinner>
         </div>
         <ion-virtual-scroll [items]="grupos" *ngIf="!cargando" approxItemHeight="65px">
-          <ion-item *virtualItem="let group">
+          <ion-item *virtualItem="let grupo">
             <ion-label>
-              <h6>{{group.asignatura}}</h6>
-              <p><span>{{ group.clave }}</span> - <span>{{group.maestro}}</span></p>
+              <h6>{{ grupo.asignatura }}</h6>
+              <p><span>{{ grupo.clave }}</span> - <span>{{ grupo.docente }}</span></p>
             </ion-label>
-            <ion-toggle (click)="onToggle($event)" [value]="group.id" [checked]="group.checked"></ion-toggle>
+            <ion-toggle (click)="onToggle($event)" [value]="grupo.id" [checked]="grupo.checked"></ion-toggle>
           </ion-item>
         </ion-virtual-scroll>
       </ion-col>

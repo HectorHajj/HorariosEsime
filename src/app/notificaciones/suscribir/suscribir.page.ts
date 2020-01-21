@@ -9,6 +9,7 @@ import { Storage } from '@ionic/storage';
   templateUrl: './suscribir.page.html',
   styleUrls: ['./suscribir.page.scss'],
 })
+
 export class SuscribirPage implements OnInit, OnDestroy {
   private gruposSub: Subscription;
   grupos: Grupo[];
@@ -40,6 +41,7 @@ export class SuscribirPage implements OnInit, OnDestroy {
   onToggle(event: any) {
     const toggledGrupo = this.grupos.find(g => g.id === event.target.value);
     let gruposASuscribir: Grupo[] = [];
+
     // Si el toggle estaba apagado
     if (event.target.checked === false) {
       // Guardar este grupo completo en memoria local
@@ -57,19 +59,11 @@ export class SuscribirPage implements OnInit, OnDestroy {
             gruposASuscribir.push(toggledGrupo);
           }
 
-          this.storage
-          .set('gruposSuscritos', gruposASuscribir)
-          .then(gruposInscritos => {
-            console.log('gruposSuscritos', gruposInscritos);
-          });
+          this.storage.set('gruposSuscritos', gruposASuscribir);
         } else {
           gruposASuscribir.push(toggledGrupo);
 
-          this.storage
-          .set('gruposSuscritos', gruposASuscribir)
-          .then(gruposInscritos => {
-            console.log('gruposSuscritos', gruposInscritos);
-          });
+          this.storage.set('gruposSuscritos', gruposASuscribir);
         }
       });
     } else if (event.target.checked === true) {
@@ -88,11 +82,7 @@ export class SuscribirPage implements OnInit, OnDestroy {
 
             gruposASuscribir = [...gruposASuscribir.filter(g => g.id !== toggledGrupo.id)];
 
-            this.storage
-            .set('gruposSuscritos', gruposASuscribir)
-            .then(gruposInscritos => {
-              console.log('gruposSuscritos', gruposInscritos);
-            });
+            this.storage.set('gruposSuscritos', gruposASuscribir);
           }
         }
       });

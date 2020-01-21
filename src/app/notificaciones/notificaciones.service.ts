@@ -2,45 +2,203 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Storage } from '@ionic/storage';
 import { Grupo } from './grupo.model';
-import { tap, take, map } from 'rxjs/operators';
+import { tap, map } from 'rxjs/operators';
 import { BehaviorSubject } from 'rxjs';
 import { Carrera } from './carrera.model';
-import { Dia } from './dia.model';
+import { Clase } from './clase.model';
 
 @Injectable({
     providedIn: 'root'
 })
-
 export class NotificacionesService {
     private Grupos = new BehaviorSubject<Grupo[]>([]);
     carreras: Carrera[] = [
-        new Carrera(
-            'ice',
-            'e',
-            'Ingeniería en Comunicaciones y Electrónica',
-            9
-        ),
-        new Carrera(
-            'ic',
-            'c',
-            'Ingeniería en Computación',
-            8
-        ),
-        new Carrera(
-            'im',
-            'm',
-            'Ingeniería Mecánica',
-            9
-        ),
-        new Carrera(
-            'isisa',
-            's',
-            'Ingeniería en Sistemas Automotricez',
-            9
-        )
+        new Carrera('ice', 'e', 'Ingeniería en Comunicaciones y Electrónica', 9),
+        new Carrera('ic', 'c', 'Ingeniería en Computación', 8),
+        new Carrera('im', 'm', 'Ingeniería Mecánica', 9),
+        new Carrera('isisa', 's', 'Ingeniería en Sistemas Automotricez', 9)
     ];
+    private gruposSuscritos: Grupo[] = [];
 
     constructor(private http: HttpClient, private storage: Storage) { }
+
+    construirGrupo(grupo, aula, suscrito: boolean) {
+        const Clases: Clase[] = [];
+        const formatoHora: RegExp = /([0-1]?[0-9]|2[0-3]):[0-5][0-9]/g;
+        let arrayHoras;
+        let horaInicio;
+        let horaFin;
+        let contador = 0;
+
+        if (grupo.v_l !== '-') {
+            while ((arrayHoras = formatoHora.exec(grupo.v_l)) !== null) {
+                if (contador === 0) {
+                    horaInicio = arrayHoras[0];
+                    contador++;
+                } else if (contador === 1) {
+                    horaFin = arrayHoras[0];
+                    contador = 0;
+                }
+            }
+            Clases.push(new Clase('l', horaInicio, horaFin, aula.v_l));
+        }
+        if (grupo.v_m !== '-') {
+            while ((arrayHoras = formatoHora.exec(grupo.v_m)) !== null) {
+                if (contador === 0) {
+                    horaInicio = arrayHoras[0];
+                    contador++;
+                } else if (contador === 1) {
+                    horaFin = arrayHoras[0];
+                    contador = 0;
+                }
+            }
+            Clases.push(new Clase('m', horaInicio, horaFin, aula.v_m));
+        }
+        if (grupo.v_x !== '-') {
+            while ((arrayHoras = formatoHora.exec(grupo.v_x)) !== null) {
+                if (contador === 0) {
+                    horaInicio = arrayHoras[0];
+                    contador++;
+                } else if (contador === 1) {
+                    horaFin = arrayHoras[0];
+                    contador = 0;
+                }
+            }
+            Clases.push(new Clase('x', horaInicio, horaFin, aula.v_x));
+        }
+        if (grupo.v_j !== '-') {
+            while ((arrayHoras = formatoHora.exec(grupo.v_j)) !== null) {
+                if (contador === 0) {
+                    horaInicio = arrayHoras[0];
+                    contador++;
+                } else if (contador === 1) {
+                    horaFin = arrayHoras[0];
+                    contador = 0;
+                }
+            }
+            Clases.push(new Clase('j', horaInicio, horaFin, aula.v_j));
+        }
+        if (grupo.v_v !== '-') {
+            while ((arrayHoras = formatoHora.exec(grupo.v_v)) !== null) {
+                if (contador === 0) {
+                    horaInicio = arrayHoras[0];
+                    contador++;
+                } else if (contador === 1) {
+                    horaFin = arrayHoras[0];
+                    contador = 0;
+                }
+            }
+            Clases.push(new Clase('v', horaInicio, horaFin, aula.v_v));
+        }
+
+        return new Grupo(
+            // Id
+            grupo.orden + grupo.v_g,
+            // Clave
+            grupo.v_g,
+            // Asignatura
+            grupo.v_a,
+            // Docente
+            grupo.v_d,
+            // Clases
+            Clases,
+            // Suscrito
+            suscrito
+        );
+    }
+
+    getGruposBySemestreCarrera(valorBusqueda, url) {
+        // Llamada a API
+        return this.http.get(url).pipe(
+            tap(data => {
+                const gruposCargados: Grupo[] = [];
+                const datos = data['data'];
+
+                // Iterar sobre lista de grupos traidos de API
+                // Armar grupos con sus detalles
+                let i: number;
+                for (i = 0; i < Object.keys(datos).length; i += 2) {
+                    const grupo = datos[i];
+                    const aula = datos[i + 1];
+
+                    // Si es el semestre buscado
+                    if (valorBusqueda[0] === grupo.v_g.charAt(0)) {
+                        // Si el grupo ya esta suscrito
+                        if (this.gruposSuscritos.find(g => g.id === grupo.orden + grupo.v_g)) {
+                            gruposCargados.push(this.construirGrupo(grupo, aula, true));
+                        } else {
+                            gruposCargados.push(this.construirGrupo(grupo, aula, false));
+                        }
+                    }
+                }
+                this.Grupos.next(gruposCargados);
+            })
+        ).subscribe();
+    }
+
+    getGruposBySemestreCarreraTurno(valorBusqueda, url) {
+        // Llamada a API
+        return this.http.get(url).pipe(
+            tap(data => {
+                const gruposCargados: Grupo[] = [];
+                const datos = data['data'];
+
+                // Iterar sobre lista de grupos traidos de API
+                // Armar grupos con sus detalles
+                let i: number;
+                for (i = 0; i < Object.keys(datos).length; i += 2) {
+                    const grupo = datos[i];
+                    const aula = datos[i + 1];
+
+                    // Si es el semestre buscado
+                    if (valorBusqueda[0] === grupo.v_g.charAt(0)) {
+                        // Filtrar a grupos del turno elegido
+                        if (valorBusqueda[2].toLowerCase() === grupo.v_g.charAt(2).toLowerCase()) {
+                            // Si el grupo ya esta suscrito
+                            if (this.gruposSuscritos.find(g => g.id === grupo.orden + grupo.v_g)) {
+                                gruposCargados.push(this.construirGrupo(grupo, aula, true));
+                            } else {
+                                gruposCargados.push(this.construirGrupo(grupo, aula, false));
+                            }
+                        }
+                    }
+                }
+                this.Grupos.next(gruposCargados);
+            })
+        ).subscribe();
+    }
+
+    getGrupoByClave(valorBusqueda, url) {
+        // Llamada a API
+        return this.http.get(url).pipe(
+            tap(data => {
+                const gruposCargados: Grupo[] = [];
+                const datos = data['data'];
+
+                // Iterar sobre lista de grupos traidos de API
+                // Armar grupos con sus detalles
+                let i: number;
+                for (i = 0; i < Object.keys(datos).length; i += 2) {
+                    const grupo = datos[i];
+                    const aula = datos[i + 1];
+
+                    // Si es el semestre buscado
+                    if (valorBusqueda[0] === grupo.v_g.charAt(0)) {
+                        // Elegir el grupo especificado
+                        if (valorBusqueda.toLowerCase() === grupo.v_g.toLowerCase()) {
+                            // Si el grupo ya esta suscrito
+                            if (this.gruposSuscritos.find(g => g.id === grupo.orden + grupo.v_g)) {
+                                gruposCargados.push(this.construirGrupo(grupo, aula, true));
+                            } else {
+                                gruposCargados.push(this.construirGrupo(grupo, aula, false));
+                            }
+                        }
+                    }
+                }
+                this.Grupos.next(gruposCargados);
+            })
+        ).subscribe();
+    }
 
     get grupos() {
         return this.Grupos.asObservable();
@@ -51,356 +209,66 @@ export class NotificacionesService {
         let url = 'http://www.eventos.esimecu.ipn.mx/horarios-2/index/compartir-grupales?';
 
         // Recuperar grupos ya suscritos
-        const gruposSuscritos: Grupo[] = [];
-        this.storage
-        .get('gruposSuscritos')
-        .then(GruposSuscritos => {
-          if (GruposSuscritos !== null) {
-            GruposSuscritos.forEach(grupo => {
-                gruposSuscritos.push(grupo);
-            });
-          }
+        this.gruposSuscritos = [];
+        this.storage.get('gruposSuscritos').then(GruposSuscritos => {
+            if (GruposSuscritos !== null) {
+                GruposSuscritos.forEach(grupo => {
+                    this.gruposSuscritos.push(grupo);
+                });
+            }
         });
 
-        // Traer todos los grupos de una semestre de la carrera indicada
+        // Traer todos los grupos de el semestre de la carrera indicada
         if (valorBusqueda.length === 2) {
-            // Primera parte - Carrera
+            // Si la búsqueda contiene la clave de una carrera existente
             this.carreras.forEach(carrera => {
                 if (valorBusqueda[1].toLowerCase() === carrera.claveCorta) {
-                    return url = url + 'carrera=' + carrera.clave;
+                    return (url = url + 'carrera=' + carrera.clave);
                 }
-
-                // Si no encuentra ninguna carrera con esa clave, revisar si es un nombre.
             });
 
-            // Segunda parte - Periodo
-            // Traer el primer periodo
-            return this.http
-            .get(url)
-            .pipe(
-                map(periodos => {
-                    url = url + '&periodo=' + periodos['data'][0].periodo;
-                }),
-                tap(periodos => {
-                    // Tercera parte - Llamada a API
-                    this.http.get(url).pipe(map(grupos => {
-                        const gruposCargados: Grupo[] = [];
-                        for (const grupo in grupos['data']) {
-                            // Si la asignatura no es null
-                            if (grupos['data'][grupo].v_a !== '') {
-                                // Si es el semestre buscado
-                                if (valorBusqueda[0] === grupos['data'][grupo].v_g.charAt(0)) {
-                                    // Si el grupo ya esta suscrito
-                                    if (gruposSuscritos.find(g => g.id === grupos['data'][grupo].orden + grupos['data'][grupo].v_g)) {
-                                        gruposCargados.push
-                                        (
-                                            new Grupo
-                                                (
-                                                    grupos['data'][grupo].orden + grupos['data'][grupo].v_g,
-                                                    grupos['data'][grupo].v_g,
-                                                    grupos['data'][grupo].v_a,
-                                                    grupos['data'][grupo].carrera,
-                                                    grupos['data'][grupo].v_g.charAt(2),
-                                                    grupos['data'][grupo].v_g.charAt(0),
-                                                    grupos['data'][grupo].v_d,
-                                                    [
-                                                        new Dia(
-                                                            'Lunes',
-                                                            grupos['data'][grupo].v_l
-                                                        ),
-                                                        new Dia(
-                                                            'Martes',
-                                                            grupos['data'][grupo].v_m,
-                                                        ),
-                                                        new Dia(
-                                                            'Miercoles',
-                                                            grupos['data'][grupo].v_x
-                                                        ),
-                                                        new Dia(
-                                                            'Jueves',
-                                                            grupos['data'][grupo].v_j
-                                                        ),
-                                                        new Dia(
-                                                            'Viernes',
-                                                            grupos['data'][grupo].v_v,
-                                                        ),
-                                                    ],
-                                                    true
-                                                )
-                                        );
-                                    } else {
-                                        gruposCargados.push
-                                            (
-                                                new Grupo
-                                                    (
-                                                        grupos['data'][grupo].orden + grupos['data'][grupo].v_g,
-                                                        grupos['data'][grupo].v_g,
-                                                        grupos['data'][grupo].v_a,
-                                                        grupos['data'][grupo].carrera,
-                                                        grupos['data'][grupo].v_g.charAt(2),
-                                                        grupos['data'][grupo].v_g.charAt(0),
-                                                        grupos['data'][grupo].v_d,
-                                                        [
-                                                            new Dia(
-                                                                'Lunes',
-                                                                grupos['data'][grupo].v_l
-                                                            ),
-                                                            new Dia(
-                                                                'Martes',
-                                                                grupos['data'][grupo].v_m,
-                                                            ),
-                                                            new Dia(
-                                                                'Miercoles',
-                                                                grupos['data'][grupo].v_x
-                                                            ),
-                                                            new Dia(
-                                                                'Jueves',
-                                                                grupos['data'][grupo].v_j
-                                                            ),
-                                                            new Dia(
-                                                                'Viernes',
-                                                                grupos['data'][grupo].v_v,
-                                                            ),
-                                                        ],
-                                                        false
-                                                    )
-                                            );
-                                    }
-                                }
-                            }
-                        }
-                        return gruposCargados;
-                    }),
-                        tap(gruposCargados => {
-                            this.Grupos.next(gruposCargados);
-                            // console.log(gruposCargados);
-                        })).subscribe();
-                }));
+            // Llama a API para determinar periodos disponibles
+            return this.http.get(url).pipe(
+                tap(data => {
+                    // Traer el periodo en curso actual
+                    url = url + '&periodo=' + data['data'][data['data'].length - 1].periodo;
+                    return this.getGruposBySemestreCarrera(valorBusqueda, url);
+                })
+            );
         } else if (valorBusqueda.length === 3) {
             // Traer todos los grupos de un turno del semestre y carrera indicados
-            // Primera parte - Carrera
+            // Si la búsqueda contiene la clave de una carrera existente
             this.carreras.forEach(carrera => {
                 if (valorBusqueda[1].toLowerCase() === carrera.claveCorta) {
-                    return url = url + 'carrera=' + carrera.clave;
+                    return (url = url + 'carrera=' + carrera.clave);
                 }
-
-                // Si no encuentra ninguna carrera con esa clave, revisar si es un nombre.
             });
 
-            // Segunda parte - Periodo
-            // Traer el primer periodo
+            // Llama a API para determinar periodos disponibles
             return this.http.get(url).pipe(
-                map(periodos => {
-                    url = url + '&periodo=' + periodos['data'][0].periodo;
-                }),
-                tap(periodos => {
-                    // Tercera parte - Llamada a API
-                    this.http.get(url).pipe(map(grupos => {
-                        const gruposCargados: Grupo[] = [];
-                        for (const grupo in grupos['data']) {
-                            if (grupos['data'][grupo].v_a !== '') {
-                                // Cuarta parte - Filtrar a grupos del semestre elegio
-                                if (valorBusqueda[0] === grupos['data'][grupo].v_g.charAt(0)) {
-                                    // Quinta parte - Filtrar a grupos del turno elegio
-                                    if (valorBusqueda[2].toLowerCase() === grupos['data'][grupo].v_g.charAt(2).toLowerCase()) {
-                                        // Si el grupo ya esta suscrito
-                                        if (gruposSuscritos.find(g => g.id === grupos['data'][grupo].orden + grupos['data'][grupo].v_g)) {
-                                            gruposCargados.push
-                                            (
-                                                new Grupo
-                                                    (
-                                                        grupos['data'][grupo].orden + grupos['data'][grupo].v_g,
-                                                        grupos['data'][grupo].v_g,
-                                                        grupos['data'][grupo].v_a,
-                                                        grupos['data'][grupo].carrera,
-                                                        grupos['data'][grupo].v_g.charAt(2),
-                                                        grupos['data'][grupo].v_g.charAt(0),
-                                                        grupos['data'][grupo].v_d,
-                                                        [
-                                                            new Dia(
-                                                                'Lunes',
-                                                                grupos['data'][grupo].v_l
-                                                            ),
-                                                            new Dia(
-                                                                'Martes',
-                                                                grupos['data'][grupo].v_m,
-                                                            ),
-                                                            new Dia(
-                                                                'Miercoles',
-                                                                grupos['data'][grupo].v_x
-                                                            ),
-                                                            new Dia(
-                                                                'Jueves',
-                                                                grupos['data'][grupo].v_j
-                                                            ),
-                                                            new Dia(
-                                                                'Viernes',
-                                                                grupos['data'][grupo].v_v,
-                                                            ),
-                                                        ],
-                                                        true
-                                                    )
-                                            );
-                                        } else {
-                                            gruposCargados.push
-                                            (
-                                                new Grupo
-                                                    (
-                                                        grupos['data'][grupo].orden + grupos['data'][grupo].v_g,
-                                                        grupos['data'][grupo].v_g,
-                                                        grupos['data'][grupo].v_a,
-                                                        grupos['data'][grupo].carrera,
-                                                        grupos['data'][grupo].v_g.charAt(2),
-                                                        grupos['data'][grupo].v_g.charAt(0),
-                                                        grupos['data'][grupo].v_d,
-                                                        [
-                                                            new Dia(
-                                                                'Lunes',
-                                                                grupos['data'][grupo].v_l
-                                                            ),
-                                                            new Dia(
-                                                                'Martes',
-                                                                grupos['data'][grupo].v_m,
-                                                            ),
-                                                            new Dia(
-                                                                'Miercoles',
-                                                                grupos['data'][grupo].v_x
-                                                            ),
-                                                            new Dia(
-                                                                'Jueves',
-                                                                grupos['data'][grupo].v_j
-                                                            ),
-                                                            new Dia(
-                                                                'Viernes',
-                                                                grupos['data'][grupo].v_v,
-                                                            ),
-                                                        ],
-                                                        false
-                                                    )
-                                            );
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                        return gruposCargados;
-                    }),
-                        tap(gruposCargados => {
-                            this.Grupos.next(gruposCargados);
-                            // console.log(gruposCargados);
-                        })).subscribe();
-                }));
+                tap(data => {
+                    // Traer el periodo en curso actual
+                    url = url + '&periodo=' + data['data'][data['data'].length - 1].periodo;
+                    return this.getGruposBySemestreCarreraTurno(valorBusqueda, url);
+                })
+            );
         } else if (valorBusqueda.length === 5) {
             // Traer el grupo especificado
-            // Primera parte - Carrera
+            // Si la búsqueda contiene la clave de una carrera existente
             this.carreras.forEach(carrera => {
                 if (valorBusqueda[1].toLowerCase() === carrera.claveCorta) {
-                    return url = url + 'carrera=' + carrera.clave;
+                    return (url = url + 'carrera=' + carrera.clave);
                 }
-
-                // Si no encuentra ninguna carrera con esa clave, revisar si es un nombre.
             });
 
-            // Segunda parte - Periodo
-            // Traer el primer periodo
+            // Llama a API para determinar periodos disponibles
             return this.http.get(url).pipe(
-                map(periodos => {
-                    url = url + '&periodo=' + periodos['data'][0].periodo;
-                }),
-                tap(periodos => {
-                    // Tercera parte - Llamada a API
-                    this.http.get(url).pipe(map(grupos => {
-                        const gruposCargados: Grupo[] = [];
-                        for (const grupo in grupos['data']) {
-                            if (grupos['data'][grupo].v_a !== '') {
-                                // Cuarta parte - Elegir el grupo especificado
-                                if (valorBusqueda.toLowerCase() === grupos['data'][grupo].v_g.toLowerCase()) {
-                                    // Si el grupo ya esta suscrito
-                                    if (gruposSuscritos.find(g => g.id === grupos['data'][grupo].orden + grupos['data'][grupo].v_g)) {
-                                        gruposCargados.push
-                                        (
-                                            new Grupo
-                                                (
-                                                    grupos['data'][grupo].orden + grupos['data'][grupo].v_g,
-                                                    grupos['data'][grupo].v_g,
-                                                    grupos['data'][grupo].v_a,
-                                                    grupos['data'][grupo].carrera,
-                                                    grupos['data'][grupo].v_g.charAt(2),
-                                                    grupos['data'][grupo].v_g.charAt(0),
-                                                    grupos['data'][grupo].v_d,
-                                                    [
-                                                        new Dia(
-                                                            'Lunes',
-                                                            grupos['data'][grupo].v_l
-                                                        ),
-                                                        new Dia(
-                                                            'Martes',
-                                                            grupos['data'][grupo].v_m,
-                                                        ),
-                                                        new Dia(
-                                                            'Miercoles',
-                                                            grupos['data'][grupo].v_x
-                                                        ),
-                                                        new Dia(
-                                                            'Jueves',
-                                                            grupos['data'][grupo].v_j
-                                                        ),
-                                                        new Dia(
-                                                            'Viernes',
-                                                            grupos['data'][grupo].v_v,
-                                                        ),
-                                                    ],
-                                                    true
-                                                )
-                                        );
-                                    } else {
-                                        gruposCargados.push
-                                        (
-                                            new Grupo
-                                                (
-                                                    grupos['data'][grupo].orden + grupos['data'][grupo].v_g,
-                                                    grupos['data'][grupo].v_g,
-                                                    grupos['data'][grupo].v_a,
-                                                    grupos['data'][grupo].carrera,
-                                                    grupos['data'][grupo].v_g.charAt(2),
-                                                    grupos['data'][grupo].v_g.charAt(0),
-                                                    grupos['data'][grupo].v_d,
-                                                    [
-                                                        new Dia(
-                                                            'Lunes',
-                                                            grupos['data'][grupo].v_l
-                                                        ),
-                                                        new Dia(
-                                                            'Martes',
-                                                            grupos['data'][grupo].v_m,
-                                                        ),
-                                                        new Dia(
-                                                            'Miercoles',
-                                                            grupos['data'][grupo].v_x
-                                                        ),
-                                                        new Dia(
-                                                            'Jueves',
-                                                            grupos['data'][grupo].v_j
-                                                        ),
-                                                        new Dia(
-                                                            'Viernes',
-                                                            grupos['data'][grupo].v_v,
-                                                        ),
-                                                    ],
-                                                    false
-                                                )
-                                        );
-                                    }
-                                }
-                            }
-                        }
-                        return gruposCargados;
-                    }),
-                        tap(gruposCargados => {
-                            this.Grupos.next(gruposCargados);
-                            // console.log(gruposCargados);
-                        })).subscribe();
-                }));
+                tap(data => {
+                    // Traer el periodo en curso actual
+                    url = url + '&periodo=' + data['data'][data['data'].length - 1].periodo;
+                    return this.getGrupoByClave(valorBusqueda, url);
+                })
+            );
         }
     }
 }

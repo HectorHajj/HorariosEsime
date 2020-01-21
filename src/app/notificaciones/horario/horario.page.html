@@ -20,27 +20,30 @@
     <ion-row *ngIf="grupos.length > 0">
       <ion-col size="12" size-sm="8" offset-sm="2">
         <ion-slides pager="true" padding>
-          <ion-slide *ngFor="let horario of horarios">
+          <ion-slide *ngFor="let dia of horario.dias">
             <ion-grid>
               <ion-row>
                 <ion-col>
-                  <h1>{{ horario.nombre }}</h1>
+                  <h1>{{ dia.nombre }}</h1>
                 </ion-col>
               </ion-row>
-              <ion-row *ngFor="let bloque of horario.bloques">
+              <ion-row *ngFor="let bloque of dia.BloquesHorarios">
                 <ion-col>
-                  <ion-card *ngIf="bloque.grupos.length > 0">
+                  <ion-card *ngIf="bloque.gruposClase.length > 0">
                     <ion-card-header>
                       <ion-card-title>{{ bloque.rango }}</ion-card-title>
                     </ion-card-header>
                     <ion-card-content>
-                      <ion-card *ngFor="let gp of bloque.grupos" color="primary">
+                      <ion-card *ngFor="let grupoClase of bloque.gruposClase" color="primary">
                         <ion-card-header>
-                          <ion-card-subtitle>{{ gp.asignatura }}</ion-card-subtitle>
+                          <ion-card-subtitle>{{ grupoClase.asignatura }}</ion-card-subtitle>
                         </ion-card-header>
                         <ion-card-content>
                           <ion-label>
-                            <p><span>{{ gp.clave }}</span> - <span>{{gp.maestro}}</span></p>
+                            <p><span>{{ grupoClase.clave }}</span> - <span>Aula {{grupoClase.aula}}</span></p>
+                          </ion-label>
+                          <ion-label>
+                            <p><span>{{grupoClase.docente}}</span></p>
                           </ion-label>
                         </ion-card-content>
                       </ion-card>
