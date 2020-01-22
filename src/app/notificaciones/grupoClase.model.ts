@@ -4,6 +4,7 @@ export class GrupoClase {
         public clave: string,
         public asignatura: string,
         public docente: string,
-        public aula: string
+        public aula: string,
+        public onCurso: boolean
     ) {}
 }

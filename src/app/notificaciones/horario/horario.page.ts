@@ -163,13 +163,15 @@ export class HorarioPage {
 
               // Si los minutos de diferencia entre fechas es mayor a 90 min, se generan dos bloques
               if (minDiferencia > 90) {
-                const bloqueSegundaHora: BloqueHorario = dia.BloquesHorarios.find(bloqueClase => bloqueClase.horaInicio === (horaFin + ':' + minFin));
+                let bloqueSegundaHora: BloqueHorario;
+                bloqueSegundaHora = dia.BloquesHorarios.find(bloqueClase => bloqueClase.horaInicio === (horaFin + ':' + minFin));
                 bloqueSegundaHora.gruposClase.push(new GrupoClase (
                   grupo.id,
                   grupo.clave,
                   grupo.asignatura,
                   grupo.docente,
-                  clase.aula
+                  clase.aula,
+                  false
                 ));
               }
 
@@ -179,7 +181,8 @@ export class HorarioPage {
                 grupo.clave,
                 grupo.asignatura,
                 grupo.docente,
-                clase.aula
+                clase.aula,
+                false
               ));
             });
           });

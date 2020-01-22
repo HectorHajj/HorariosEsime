@@ -26,6 +26,13 @@ export class SuscribirPage implements OnInit, OnDestroy {
     });
   }
 
+  /*ionViewWillEnter() {
+    this.grupos = [];
+    document.querySelector('ion-searchbar').getInputElement().then((searchInput) => {
+      searchInput.value = '';
+   });
+  }*/
+
   busqueda(event: any) {
     this.grupos = [];
     this.cargando = true;
@@ -50,17 +57,37 @@ export class SuscribirPage implements OnInit, OnDestroy {
       .get('gruposSuscritos')
       .then(gruposSuscritos => {
         if (gruposSuscritos !== null) {
-
+          // Si ya había grupos suscritos, se añaden a array que se guardará
           gruposSuscritos.forEach(grupo => {
             gruposASuscribir.push(grupo);
           });
 
-          if (!gruposASuscribir.find(g => g.id === toggledGrupo.id)) {
-            gruposASuscribir.push(toggledGrupo);
-          }
+          // Verificar si tiene laboratorios
+          const laboratorios = this.grupos.filter(labs => labs.clave === toggledGrupo.clave);
 
-          this.storage.set('gruposSuscritos', gruposASuscribir);
+          // Si hay mas grupos con clave (tiene laboratorios)
+          if (laboratorios.length > 1) {
+            // Si no estan ya suscritos
+            if (!gruposASuscribir.find(g => g.id === toggledGrupo.id)) {
+              laboratorios.forEach(grupo => {
+                grupo.checked = true;
+                gruposASuscribir.push(grupo);
+              });
+            }
+
+            // Guardar en memoria local los grupos suscritos
+            this.storage.set('gruposSuscritos', gruposASuscribir);
+          } else {
+            // Si no esta ya suscrito
+            if (!gruposASuscribir.find(g => g.id === toggledGrupo.id)) {
+              gruposASuscribir.push(toggledGrupo);
+            }
+
+            // Guardar en memoria local los grupos suscritos
+            this.storage.set('gruposSuscritos', gruposASuscribir);
+          }
         } else {
+          // Si no había grupos suscritos
           gruposASuscribir.push(toggledGrupo);
 
           this.storage.set('gruposSuscritos', gruposASuscribir);
@@ -80,7 +107,16 @@ export class SuscribirPage implements OnInit, OnDestroy {
 
           if (gruposASuscribir.find(g => g.id === toggledGrupo.id)) {
 
-            gruposASuscribir = [...gruposASuscribir.filter(g => g.id !== toggledGrupo.id)];
+            gruposASuscribir = [...gruposASuscribir.filter(g => g.clave !== toggledGrupo.clave)];
+
+            // Si eran varios grupos, actualizar check
+            const laboratorios = this.grupos.filter(labs => labs.clave === toggledGrupo.clave);
+
+            if (laboratorios.length > 1) {
+              laboratorios.forEach(grupo => {
+                grupo.checked = false;
+              });
+            }
 
             this.storage.set('gruposSuscritos', gruposASuscribir);
           }
