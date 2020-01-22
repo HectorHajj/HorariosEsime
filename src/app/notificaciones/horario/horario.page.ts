@@ -146,6 +146,33 @@ export class HorarioPage {
               const dia: Dia = this.horario.dias.find(diaClase => diaClase.clave === clase.claveDia);
               const bloque: BloqueHorario = dia.BloquesHorarios.find(bloqueClase => bloqueClase.horaInicio === clase.horaInicio);
 
+              // Si la clase no es de 1:30 de duración dividir en dos bloques
+              // Comprobar si la clase es de 1:30 de duración
+              const formatoHora: RegExp = /([0-1]?[0-9]|2[0-3]):/;
+              const formatoMinuto: RegExp = /:[0-5][0-9]/;
+
+              const horaInicio = formatoHora.exec(bloque.horaInicio);
+              const minInicio = formatoMinuto.exec(bloque.horaInicio);
+              const dateInicio = new Date(1970, 1, 1, parseInt(horaInicio[0].slice(0, -1), 10), parseInt(minInicio[0].slice(1), 10), 0);
+
+              const horaFin = formatoHora.exec(bloque.horaFin);
+              const minFin = formatoMinuto.exec(bloque.horaFin);
+              const dateFin = new Date(1970, 1, 1, parseInt(horaFin[0].slice(0, -1), 10), parseInt(minFin[0].slice(1), 10), 0);
+
+              const minDiferencia = (dateFin.getTime() - dateInicio.getTime()) / 60000;
+
+              // Si los minutos de diferencia entre fechas es mayor a 90 min, se generan dos bloques
+              if (minDiferencia > 90) {
+                const bloqueSegundaHora: BloqueHorario = dia.BloquesHorarios.find(bloqueClase => bloqueClase.horaInicio === (horaFin + ':' + minFin));
+                bloqueSegundaHora.gruposClase.push(new GrupoClase (
+                  grupo.id,
+                  grupo.clave,
+                  grupo.asignatura,
+                  grupo.docente,
+                  clase.aula
+                ));
+              }
+
               // Construir y agregar GrupoClase
               bloque.gruposClase.push(new GrupoClase (
                 grupo.id,
