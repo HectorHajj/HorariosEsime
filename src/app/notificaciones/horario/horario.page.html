@@ -34,7 +34,7 @@
                       <ion-card-title>{{ bloque.rango }}</ion-card-title>
                     </ion-card-header>
                     <ion-card-content>
-                      <ion-card *ngFor="let grupoClase of bloque.gruposClase" color="primary">
+                      <ion-card *ngFor="let grupoClase of bloque.gruposClase" [color]="grupoClase.enCurso">
                         <ion-card-header>
                           <ion-card-subtitle>{{ grupoClase.asignatura }}</ion-card-subtitle>
                         </ion-card-header>

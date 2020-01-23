@@ -141,6 +141,8 @@ export class HorarioPage {
 
         // Armar Horario con las clases de los grupos suscritos
         if (this.grupos.length > 0) {
+          const fechaHoy: Date = new Date(Date.now());
+          const claveHoy = this.getClaveDiaHoy();
           this.grupos.forEach(grupo => {
             grupo.Clases.forEach(clase => {
               const dia: Dia = this.horario.dias.find(diaClase => diaClase.clave === clase.claveDia);
@@ -153,11 +155,23 @@ export class HorarioPage {
 
               const horaInicio = formatoHora.exec(bloque.horaInicio);
               const minInicio = formatoMinuto.exec(bloque.horaInicio);
-              const dateInicio = new Date(1970, 1, 1, parseInt(horaInicio[0].slice(0, -1), 10), parseInt(minInicio[0].slice(1), 10), 0);
+              const dateInicio = new Date(
+                fechaHoy.getFullYear(),
+                fechaHoy.getMonth(),
+                fechaHoy.getDate(),
+                parseInt(horaInicio[0].slice(0, -1), 10),
+                parseInt(minInicio[0].slice(1), 10), 0
+                );
 
               const horaFin = formatoHora.exec(bloque.horaFin);
               const minFin = formatoMinuto.exec(bloque.horaFin);
-              const dateFin = new Date(1970, 1, 1, parseInt(horaFin[0].slice(0, -1), 10), parseInt(minFin[0].slice(1), 10), 0);
+              const dateFin = new Date(
+                fechaHoy.getFullYear(),
+                fechaHoy.getMonth(),
+                fechaHoy.getDate(),
+                parseInt(horaFin[0].slice(0, -1), 10),
+                parseInt(minFin[0].slice(1), 10), 0
+                );
 
               const minDiferencia = (dateFin.getTime() - dateInicio.getTime()) / 60000;
 
@@ -165,28 +179,60 @@ export class HorarioPage {
               if (minDiferencia > 90) {
                 let bloqueSegundaHora: BloqueHorario;
                 bloqueSegundaHora = dia.BloquesHorarios.find(bloqueClase => bloqueClase.horaInicio === (horaFin + ':' + minFin));
-                bloqueSegundaHora.gruposClase.push(new GrupoClase (
+
+                // Si el bloque horario esta transcurriendo se marca como en curso
+                if (fechaHoy.getTime() >= dateInicio.getTime() && fechaHoy.getTime() <= dateFin.getTime() && dia.clave === claveHoy) {
+                  bloqueSegundaHora.gruposClase.push(new GrupoClase (
+                    grupo.id,
+                    grupo.clave,
+                    grupo.asignatura,
+                    grupo.docente,
+                    clase.aula,
+                    'success'
+                  ));
+                } else {
+                  bloqueSegundaHora.gruposClase.push(new GrupoClase (
+                    grupo.id,
+                    grupo.clave,
+                    grupo.asignatura,
+                    grupo.docente,
+                    clase.aula,
+                    'primary'
+                  ));
+                }
+              }
+
+              // Si el bloque horario esta transcurriendo se marca como en curso
+              if (fechaHoy.getTime() >= dateInicio.getTime() && fechaHoy.getTime() <= dateFin.getTime() && dia.clave === claveHoy) {
+                // Construir y agregar GrupoClase
+                bloque.gruposClase.push(new GrupoClase (
                   grupo.id,
                   grupo.clave,
                   grupo.asignatura,
                   grupo.docente,
                   clase.aula,
-                  false
+                  'success'
+                ));
+              } else {
+                // Construir y agregar GrupoClase
+                bloque.gruposClase.push(new GrupoClase (
+                  grupo.id,
+                  grupo.clave,
+                  grupo.asignatura,
+                  grupo.docente,
+                  clase.aula,
+                  'primary'
                 ));
               }
-
-              // Construir y agregar GrupoClase
-              bloque.gruposClase.push(new GrupoClase (
-                grupo.id,
-                grupo.clave,
-                grupo.asignatura,
-                grupo.docente,
-                clase.aula,
-                false
-              ));
             });
           });
         }
       });
+  }
+
+  getClaveDiaHoy() {
+    const fechaHoy: Date = new Date(Date.now());
+    let dias = ["d", "l", "m", "x", "j", "v", "s"];
+    return dias[fechaHoy.getDay()]
   }
 }
