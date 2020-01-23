@@ -232,7 +232,7 @@ export class HorarioPage {
 
   getClaveDiaHoy() {
     const fechaHoy: Date = new Date(Date.now());
-    let dias = ["d", "l", "m", "x", "j", "v", "s"];
-    return dias[fechaHoy.getDay()]
+    const dias = ['d', 'l', 'm', 'x', 'j', 'v', 's'];
+    return dias[fechaHoy.getDay()];
   }
 }
